@@ -8,7 +8,7 @@ import rubix.Squrare.Color;
 * Created by: Michael balcerzak
 * Created on: 4-Dec-2016
 * Created for: ICS3U
-* Final thing – Unit#5
+* Final thing â€“ Unit#5
 * this class is the whole cube that it can be rotated on each side
 */
 
@@ -248,12 +248,12 @@ public class Cube extends RubixCube{
 		} else if (rotations == 7) {
 			listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/2, 3, /*face3*/2, 3, /*face4*/2, 3, /*face5*/ 0, 2, 3, 1, 2, 1, 4, 3, 5);
 			
-			step = Move.valueOf("BottomClockwise");
+			step = Move.valueOf("BottomCounterClockwise");
 			instructions[bigCounter] = step;
 		} else if (rotations == 8) {			
 			listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/2, 3, /*face3*/2, 3, /*face4*/2, 3, /*face5*/ 0, 1, 3, 2, 2, 3, 4, 1, 5);
 			
-			step = Move.valueOf("BottomCounterClockwise");
+			step = Move.valueOf("BottomClockwise");
 			instructions[bigCounter] = step;
 		} else if (rotations == 9) {
 			listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/3, 1, /*face2*/3, 1, /*face3*/3, 1, /*face4*/0, 2,  /*face5*/ 0, 2, 3, 1, 0, 2, 5, 4, 3);
