@@ -2,7 +2,7 @@ package rubix;
 import java.util.List;
 import java.util.ArrayList;
 
-import rubix.Squrare.Color;
+import rubix.Square.Color;
 
 /*
 * Created by: Michael balcerzak
@@ -21,13 +21,6 @@ public class Cube extends RubixCube{
 	protected Face face5 = new Face();
 	protected Face face6 = new Face();
 	protected Face[] faces = new Face[6];
-	private Face finishFace1 = new Face();
-	private Face finishFace2 = new Face();
-	private Face finishFace3 = new Face();
-	private Face finishFace4 = new Face();
-	private Face finishFace5 = new Face();
-	private Face finishFace6 = new Face();
-	private Face[] finishFaces = new Face[6];
 	private boolean stopSolving = false;
 	protected static boolean checkRed = true;
 	protected static boolean checkBlue = true;
@@ -35,7 +28,7 @@ public class Cube extends RubixCube{
 	protected static boolean checkYellow = true;
 	protected static boolean checkWhite = true;
 	protected static boolean checkOrange = true;
-	private Move[] instructions = new Move[16];
+	private Move[] instructions = new Move[18];
 	
 	public enum Move {
 		// this displayes all movements of the cube
@@ -108,29 +101,34 @@ public class Cube extends RubixCube{
 		return moreThanFour;
 	}
 	
-	public Face[] finalCube(Face[] finishCube) {
+	public boolean CheckFinish(List<Face[]> listOfPositions) {
 		// this function makes the final position of the cube
-		Square.Color color = Square.Color.valueOf("white");
-		for (int counter = 0; counter < 6; counter++) {
-			if (counter==0) {
-				color = Square.Color.valueOf("white");
-			} else if (counter==1) {
-				color = Square.Color.valueOf("green");
-			} else if (counter==2) {
-				color = Square.Color.valueOf("red");
-			} else if (counter==3) {
-				color = Square.Color.valueOf("blue");
-			} else if (counter==4) {
-				color = Square.Color.valueOf("orange");
-			} else if (counter==5) {
-				color = Square.Color.valueOf("yellow");
-			}
-			for (int counter2 = 0; counter2 < 4; counter2++) {
-				finishCube[counter].squares[counter2].color = color;
+		int sameSquare = 0;
+		boolean finishCube = false;
+				
+		for(int counter = 0; counter < listOfPositions.size(); counter++) {
+			sameSquare = 0;
+			for (int counter1 = 0; counter1 < 6; counter1++) {
+				if ((listOfPositions.get(counter)[counter1].squares[0].color == listOfPositions.get(counter)[counter1].squares[1].color)) {
+					sameSquare++;
+				}
+				if ((listOfPositions.get(counter)[counter1].squares[1].color == listOfPositions.get(counter)[counter1].squares[2].color)) {
+					sameSquare++;
+				}
+				if ((listOfPositions.get(counter)[counter1].squares[2].color == listOfPositions.get(counter)[counter1].squares[3].color)) {
+					sameSquare++;
+				}
+				if ((listOfPositions.get(counter)[counter1].squares[3].color == listOfPositions.get(counter)[counter1].squares[0].color)) {
+					sameSquare++;
+				}	
 			}
 		}
-		
-		return finishCube;
+				
+		if (sameSquare > 23) {
+			finishCube = true;
+		}
+				
+			return finishCube;
 	}
 	
 	public List<Face[]> RotateCounterClockWise(List<Face[]> listOfPositions, Face[] OwnFace, int up1, int up2, int right1, int right2, int down1, int down2, int left1, int left2, int frontUpLeft, int frontUpRight, int frontDownRight, int frontDownLeft, int face1, int face2, int face3, int face4, int face5) {
@@ -220,7 +218,7 @@ public class Cube extends RubixCube{
 			
 			step = Move.valueOf("FrontClockwise");
 			instructions[bigCounter] = step;
-		} else if (rotations == 2) {
+		}  else if (rotations == 2) {
 			listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/0, 2, /*face3*/1, 0, /*face4*/3, 1,  /*face5*/ 0, 1, 3, 2, 0, 3, 5, 1, 2); 
 
 			step = Move.valueOf("FrontCounterClockwise");
@@ -232,10 +230,10 @@ public class Cube extends RubixCube{
 			instructions[bigCounter] = step;
 		} else if (rotations == 4) {
 			listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/1, 3, /*face3*/3, 2, /*face4*/2, 0, /*face5*/ 0, 1, 3, 2, 0, 3, 5, 1, 4); 	
-			
+
 			step = Move.valueOf("BackCounterClockwise");
 			instructions[bigCounter] = step;
-		} else if (rotations == 5) {
+		}else if (rotations == 5) {
 			listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/0, 1, /*face3*/0, 1, /*face4*/0, 1, /*face5*/ 0, 2, 3, 1, 4, 3, 2, 1, 0); 
 			
 			step = Move.valueOf("TopCounterClockwise");
@@ -280,25 +278,11 @@ public class Cube extends RubixCube{
 		bigCounter = bigCounter + 1;
 		
 		// this part sees if the cube is finish
-		PutAllTheFaces(finishFaces, finishFace1, finishFace2, finishFace3, finishFace4, finishFace5, finishFace6);
-		finishFaces = finalCube(finishFaces);
+		boolean finishCube = CheckFinish(listOfPositions); 
 		
-		int sameFace = 0;
-		
-		for(int counter = 0; counter < listOfPositions.size(); counter++) {
-			sameFace = 0;
-			for (int counter1 = 0; counter1 < 6; counter1++) {
-				for (int counter2 = 0; counter2 < 4; counter2++) {
-					if ((listOfPositions.get(counter)[counter1].squares[counter2].color == finishFaces[counter1].squares[counter2].color)) {
-						sameFace++;
-					}
-				}
-			}	
-		}
 		
 		//this part tells the instruction of how the cube is solved
-		
-		if (sameFace > 23) {
+		if (finishCube == true) {
 			for (int counter2 = 0; counter2 < instructions.length; counter2++) {
 				System.out.println(instructions[counter2]);
 				stopSolving = true;
@@ -306,77 +290,74 @@ public class Cube extends RubixCube{
 		}
 		
 		//this part do recursion but only for 16 times so it will not cause overflow
-			if (bigCounter > 15) {
-				System.out.println("I reach more than 16 moves");
+			if (bigCounter > 17) {
+				System.out.println("I reach more than 18 moves");
 				System.out.println("");
 			} else {
-				recrusionPart(listOfPositions, bigCounter);
+				RotateFaces(1, listOfPositions, bigCounter);
+				listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/0, 2, /*face3*/1, 0, /*face4*/3, 1,  /*face5*/ 0, 1, 3, 2, 0, 3, 5, 1, 2); 
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(2, listOfPositions, bigCounter);
+				listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/2,  3, /*face2*/3, 1, /*face3*/1, 0, /*face4*/0, 2, /*face5*/ 0, 2, 3, 1, 0, 1, 5, 3, 2);
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(3, listOfPositions, bigCounter);
+				listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/1, 3, /*face3*/3, 2, /*face4*/2, 0, /*face5*/ 0, 1, 3, 2, 0, 3, 5, 1, 4); 	
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(4, listOfPositions, bigCounter);
+				listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/2, 0, /*face3*/3, 2, /*face4*/1, 3, /*face5*/ 0, 2, 3, 1, 0, 1, 5, 3, 4); 			
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(5, listOfPositions, bigCounter);
+				listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/0, 1, /*face3*/0, 1, /*face4*/0, 1, /*face5*/ 0, 1, 3, 2, 4, 1, 2, 3, 0); 
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(6, listOfPositions, bigCounter);
+				listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/0, 1, /*face3*/0, 1, /*face4*/0, 1, /*face5*/ 0, 2, 3, 1, 4, 3, 2, 1, 0); 
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(7, listOfPositions, bigCounter);
+				listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/2, 3, /*face3*/2, 3, /*face4*/2, 3, /*face5*/ 0, 1, 3, 2, 2, 3, 4, 1, 5);
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(8, listOfPositions, bigCounter);
+				listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/2, 3, /*face3*/2, 3, /*face4*/2, 3, /*face5*/ 0, 2, 3, 1, 2, 1, 4, 3, 5);
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(9, listOfPositions, bigCounter);
+				listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/3, 1, /*face2*/0, 2, /*face3*/3, 1, /*face4*/3, 1, /*face5*/ 0, 1, 3, 2, 0, 4, 5, 2, 3);	
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(10, listOfPositions, bigCounter);
+				listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/3, 1, /*face2*/3, 1, /*face3*/3, 1, /*face4*/0, 2,  /*face5*/ 0, 2, 3, 1, 0, 2, 5, 4, 3);
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(11, listOfPositions,  bigCounter);
+				listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 2, /*face2*/3, 1, /*face3*/0, 2, /*face4*/0, 2, /*face5*/ 0, 1, 3, 2, 0, 4, 5, 2, 1);
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
+				RotateFaces(12, listOfPositions,  bigCounter);
+				listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 2, /*face2*/0, 2, /*face3*/0, 2, /*face4*/3, 1, /*face5*/ 0, 2, 3, 1, 0, 2, 5, 4, 1);
+				if (stopSolving == false) {
+					instructions[bigCounter] = null;
+				}
 			}
 		
 		}
 		
 	}
 	
-	protected void recrusionPart(List<Face[]> listOfPositions, int bigCounter) {
-		RotateFaces(1, listOfPositions, bigCounter);
-		listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/0, 2, /*face3*/1, 0, /*face4*/3, 1,  /*face5*/ 0, 1, 3, 2, 0, 3, 5, 1, 2); 
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(2, listOfPositions, bigCounter);
-		listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/2,  3, /*face2*/3, 1, /*face3*/1, 0, /*face4*/0, 2, /*face5*/ 0, 2, 3, 1, 0, 1, 5, 3, 2);
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(3, listOfPositions, bigCounter);
-		listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/1, 3, /*face3*/3, 2, /*face4*/2, 0, /*face5*/ 0, 1, 3, 2, 0, 3, 5, 1, 4); 	
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(4, listOfPositions, bigCounter);
-		listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/2, 0, /*face3*/3, 2, /*face4*/1, 3, /*face5*/ 0, 2, 3, 1, 0, 1, 5, 3, 4); 			
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(5, listOfPositions, bigCounter);
-		listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/0, 1, /*face3*/0, 1, /*face4*/0, 1, /*face5*/ 0, 1, 3, 2, 4, 1, 2, 3, 0); 
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(6, listOfPositions, bigCounter);
-		listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 1, /*face2*/0, 1, /*face3*/0, 1, /*face4*/0, 1, /*face5*/ 0, 2, 3, 1, 4, 3, 2, 1, 0); 
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(7, listOfPositions, bigCounter);
-		listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/2, 3, /*face3*/2, 3, /*face4*/2, 3, /*face5*/ 0, 1, 3, 2, 2, 3, 4, 1, 5);
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(8, listOfPositions, bigCounter);
-		listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/2, 3, /*face2*/2, 3, /*face3*/2, 3, /*face4*/2, 3, /*face5*/ 0, 2, 3, 1, 2, 1, 4, 3, 5);
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(9, listOfPositions, bigCounter);
-		listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/3, 1, /*face2*/0, 2, /*face3*/3, 1, /*face4*/3, 1, /*face5*/ 0, 1, 3, 2, 0, 4, 5, 2, 3);	
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(10, listOfPositions, bigCounter);
-		listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/3, 1, /*face2*/3, 1, /*face3*/3, 1, /*face4*/0, 2,  /*face5*/ 0, 2, 3, 1, 0, 2, 5, 4, 3);
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(11, listOfPositions,  bigCounter);
-		listOfPositions = RotateCounterClockWise(listOfPositions, faces, /*face1*/0, 2, /*face2*/3, 1, /*face3*/0, 2, /*face4*/0, 2, /*face5*/ 0, 1, 3, 2, 0, 4, 5, 2, 1);
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-		RotateFaces(12, listOfPositions,  bigCounter);
-		listOfPositions = RotateClockWise(listOfPositions, faces, /*face1*/0, 2, /*face2*/0, 2, /*face3*/0, 2, /*face4*/3, 1, /*face5*/ 0, 2, 3, 1, 0, 2, 5, 4, 1);
-		if (stopSolving == false) {
-			instructions[bigCounter] = null;
-		}
-	}
 }
